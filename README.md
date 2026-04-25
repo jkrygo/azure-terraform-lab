@@ -162,7 +162,6 @@ variable "admin_password" {
   sensitive   = true
 }
 ```
-```
 
 [![VM Apply Complete](screenshots/03-terraform-vm-apply.png)](screenshots/03-terraform-vm-apply.png)
 
