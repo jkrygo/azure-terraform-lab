@@ -104,6 +104,8 @@ resource "azurerm_subnet" "lab" {
 
 Added a public IP, network interface, and Windows Server 2022 VM. The VM references the NIC, which references the subnet, creating an implicit dependency chain that Terraform resolves automatically.
 
+The admin password is passed via an input variable rather than hardcoded. The variable is defined in `variables.tf` and marked as `sensitive = true` so it is never printed in plan or apply output. The actual value is supplied at runtime via a `.tfvars` file which is excluded from version control via `.gitignore`.
+
 ```hcl
 resource "azurerm_public_ip" "lab" {
   name                = "pip-terraform-lab"
@@ -133,7 +135,7 @@ resource "azurerm_windows_virtual_machine" "lab" {
   location            = azurerm_resource_group.lab.location
   size                = "Standard_B2ats_v2"
   admin_username      = "labadmin"
-  admin_password      = "LabAdmin123!"
+  admin_password      = var.admin_password
 
   network_interface_ids = [azurerm_network_interface.lab.id]
 
@@ -149,6 +151,17 @@ resource "azurerm_windows_virtual_machine" "lab" {
     version   = "latest"
   }
 }
+```
+
+`variables.tf`:
+
+```hcl
+variable "admin_password" {
+  description = "Admin password for the VM"
+  type        = string
+  sensitive   = true
+}
+```
 ```
 
 [![VM Apply Complete](screenshots/03-terraform-vm-apply.png)](screenshots/03-terraform-vm-apply.png)
